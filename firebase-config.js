@@ -1,12 +1,10 @@
-// firebase-config.js
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
 import { getAuth, signInAnonymously } from "firebase/auth";
 
-// TODO: Add your Firebase project configuration here
 const firebaseConfig = {
-    apiKey: "AIzaSyDT4Cm1gxwkxpW4GY3UTqCk0HAIigPuc5U",
+    apiKey: "AIzaSyDT4Cm1gxwkxpW4G3YUTqCk0HAIigPuc5U",
     authDomain: "catch-the-ball-e7812.firebaseapp.com",
     projectId: "catch-the-ball-e7812",
     storageBucket: "catch-the-ball-e7812.appspot.com",

@@ -108,17 +108,17 @@ canvas.addEventListener("touchmove", touchMoveHandler, false);
 canvas.addEventListener("touchend", touchEndHandler, false);
 
 function keyDownHandler(e) {
-    if (e.key == "Right" || e.key == "ArrowRight") {
+    if (e.key === "Right" || e.key === "ArrowRight") {
         rightPressed = true;
-    } else if (e.key == "Left" || e.key == "ArrowLeft") {
+    } else if (e.key === "Left" || e.key === "ArrowLeft") {
         leftPressed = true;
     }
 }
 
 function keyUpHandler(e) {
-    if (e.key == "Right" || e.key == "ArrowRight") {
+    if (e.key === "Right" || e.key === "ArrowRight") {
         rightPressed = false;
-    } else if (e.key == "Left" || e.key == "ArrowLeft") {
+    } else if (e.key === "Left" || e.key === "ArrowLeft") {
         leftPressed = false;
     }
 }
@@ -148,7 +148,7 @@ function collisionDetection(ball) {
     for (let c = 0; c < brickColumnCount; c++) {
         for (let r = 0; r < brickRowCount; r++) {
             const b = bricks[c][r];
-            if (b.status == 1) {
+            if (b.status === 1) {
                 if (
                     ball.x > b.x &&
                     ball.x < b.x + brickWidth &&
