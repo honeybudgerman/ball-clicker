@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breakout Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="mainScreen">
+        <h1>Breakout Game</h1>
+        <p>Score: <span id="totalScore">0</span></p>
+        <button id="playButton">Play</button>
+    </div>
+    <canvas id="gameCanvas" width="480" height="320" style="display: none;"></canvas>
+    <div id="timer" style="display: none;">Time: <span id="timeLeft">30</span>s</div>
+    <script src="game.js"></script>
+</body>
+</html>
