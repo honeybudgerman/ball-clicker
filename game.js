@@ -1,7 +1,3 @@
-import { db, auth } from './firebase-config.js';
-import { collection, addDoc, query, where, orderBy, getDocs, serverTimestamp, limit } from 'firebase/firestore';
-
-// Game variables and initialization
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const mainScreen = document.getElementById('mainScreen');
@@ -205,20 +201,6 @@ function endGame() {
     mainScreen.style.display = 'block';
     canvas.style.display = 'none';
     timerDisplay.style.display = 'none';
-
-    // Save score to Firebase
-    const user = auth.currentUser;
-    if (user) {
-        addDoc(collection(db, 'scores'), {
-            userId: user.uid,
-            score: totalScore,
-            timestamp: serverTimestamp()
-        }).then(() => {
-            console.log("Score saved successfully!");
-        }).catch((error) => {
-            console.error("Error saving score:", error);
-        });
-    }
 }
 
 function drawBonus(bonus) {
@@ -289,33 +271,6 @@ function draw() {
     if (timeLeft > 0) {
         requestAnimationFrame(draw);
     }
-}
-
-// Load user scores on page load
-document.addEventListener('DOMContentLoaded', function() {
-    const user = auth.currentUser;
-    if (user) {
-        loadUserScores(user.uid);
-    } else {
-        auth.onAuthStateChanged(function(user) {
-            if (user) {
-                loadUserScores(user.uid);
-            }
-        });
-    }
-});
-
-function loadUserScores(userId) {
-    const q = query(collection(db, 'scores'), where('userId', '==', userId), orderBy('timestamp', 'desc'), limit(1));
-    getDocs(q).then((querySnapshot) => {
-        if (!querySnapshot.empty) {
-            const highestScore = querySnapshot.docs[0].data().score;
-            totalScore = highestScore;
-            totalScoreDisplay.textContent = totalScore;
-        }
-    }).catch((error) => {
-        console.error("Error getting scores:", error);
-    });
 }
 
 playButton.addEventListener('click', startGame);
