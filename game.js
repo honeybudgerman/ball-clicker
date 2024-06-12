@@ -117,7 +117,8 @@ canvas.addEventListener("touchstart", touchStartHandler, false);
 canvas.addEventListener("touchmove", touchMoveHandler, false);
 canvas.addEventListener("touchend", touchEndHandler, false);
 
-document.addEventListener("click", handleClick, false);
+document.addEventListener("mousedown", handleMouseDown, false);
+document.addEventListener("mouseup", handleMouseUp, false);
 
 function keyDownHandler(e) {
     if (e.key === "Right" || e.key === "ArrowRight") {
@@ -135,7 +136,7 @@ function keyUpHandler(e) {
     }
 }
 
-function handleClick(e) {
+function handleMouseDown(e) {
     const rect = canvas.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     if (clickX < canvas.width / 2) {
@@ -145,6 +146,11 @@ function handleClick(e) {
         rightPressed = true;
         leftPressed = false;
     }
+}
+
+function handleMouseUp(e) {
+    leftPressed = false;
+    rightPressed = false;
 }
 
 function touchStartHandler(e) {
@@ -171,8 +177,8 @@ function touchMoveHandler(e) {
 }
 
 function touchEndHandler(e) {
-    touchStartX = 0;
-    touchEndX = 0;
+    leftPressed = false;
+    rightPressed = false;
 }
 
 function collisionDetection(ball) {
