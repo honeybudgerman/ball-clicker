@@ -126,7 +126,7 @@ function touchStartHandler(e) {
 function touchMoveHandler(e) {
     touchEndX = e.touches[0].clientX;
     const deltaX = touchEndX - touchStartX;
-    paddleX += deltaX;
+    paddleX += deltaX / canvas.width * canvas.clientWidth; // Адаптивное перемещение
     if (paddleX < 0) {
         paddleX = 0;
     } else if (paddleX + paddleWidth > canvas.width) {
