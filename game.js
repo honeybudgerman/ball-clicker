@@ -9,6 +9,9 @@ const timeLeftDisplay = document.getElementById('timeLeft');
 const energyDisplay = document.getElementById('energyDisplay');
 const energyTimerDisplay = document.getElementById('energyTimer');
 
+const botToken = '7355743766:AAGGRqA_g_L1SxnjXAWRZKBJoWcizUq3qOE';
+const chatId = ''; // Добавьте ваш chat_id
+
 const paddleHeight = 10;
 const paddleWidth = 75;
 let paddleX = (canvas.width - paddleWidth) / 2;
@@ -260,6 +263,7 @@ function endGame() {
     timerDisplay.style.display = 'none';
     balls.forEach(resetBallSpeed);
     balls = [];
+    saveUserData();
 }
 
 function drawBonus(bonus) {
@@ -328,6 +332,16 @@ function draw() {
     if (timeLeft > 0) {
         animationId = requestAnimationFrame(draw);
     }
+}
+
+function saveUserData() {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", `https://api.telegram.org/bot${botToken}/sendMessage`, true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.send(JSON.stringify({
+        chat_id: chatId,
+        text: `/save ${totalScore} ${energy}`
+    }));
 }
 
 function shareScore() {
