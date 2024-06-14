@@ -2,6 +2,7 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const mainScreen = document.getElementById('mainScreen');
 const playButton = document.getElementById('playButton');
+const shareButton = document.getElementById('shareButton');
 const totalScoreDisplay = document.getElementById('totalScore');
 const timerDisplay = document.getElementById('timer');
 const timeLeftDisplay = document.getElementById('timeLeft');
@@ -37,10 +38,32 @@ const energyRecoveryTime = 30000;  // 30 секунд
 let touchStartX = 0;
 let touchEndX = 0;
 
+// Load saved game data
+function loadGameData() {
+    const savedEnergy = localStorage.getItem('energy');
+    const savedTotalScore = localStorage.getItem('totalScore');
+    
+    if (savedEnergy !== null) {
+        energy = parseInt(savedEnergy, 10);
+    }
+    if (savedTotalScore !== null) {
+        totalScore = parseInt(savedTotalScore, 10);
+    }
+    energyDisplay.textContent = energy;
+    totalScoreDisplay.textContent = totalScore;
+}
+
+// Save game data
+function saveGameData() {
+    localStorage.setItem('energy', energy);
+    localStorage.setItem('totalScore', totalScore);
+}
+
 function updateEnergy() {
     if (energy < 100) {
         energy += 1;
         energyDisplay.textContent = energy;
+        saveGameData(); // Save game data when energy is updated
     }
 }
 
@@ -226,6 +249,7 @@ function startGame() {
     }
     energy -= energyConsumption;
     energyDisplay.textContent = energy;
+    saveGameData(); // Save game data when game starts
 
     mainScreen.style.display = 'none';
     canvas.style.display = 'block';
@@ -245,6 +269,7 @@ function endGame() {
     cancelAnimationFrame(animationId); // Отменяем анимацию при завершении игры
     totalScore += score;
     totalScoreDisplay.textContent = totalScore;
+    saveGameData(); // Save game data when game ends
     mainScreen.style.display = 'block';
     canvas.style.display = 'none';
     timerDisplay.style.display = 'none';
@@ -322,4 +347,14 @@ function draw() {
     }
 }
 
+function shareScore() {
+    const message = `I scored ${totalScore} points in Breakout Game! Can you beat my score?`;
+    const url = `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+}
+
 playButton.addEventListener('click', startGame);
+shareButton.addEventListener('click', shareScore);
+
+// Load game data when the page loads
+window.onload = loadGameData;
