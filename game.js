@@ -11,11 +11,7 @@ const paddleHeight = 10;
 const paddleWidth = 75;
 let paddleX = (canvas.width - paddleWidth) / 2;
 const ballRadius = 10;
-let x = canvas.width / 2;
-let y = canvas.height - 30;
 const initialSpeed = 2;  // фиксированная скорость мяча
-let dx = initialSpeed;
-let dy = -initialSpeed;
 let bricks = [];
 const brickRowCount = 5;
 const brickColumnCount = 3;
@@ -26,7 +22,7 @@ const brickOffsetTop = 30;
 const brickOffsetLeft = 30;
 let score = 0;
 let totalScore = 0;
-let balls = [{ x, y, dx, dy }];
+let balls = [];
 let bonuses = [];
 let timer;
 const gameDuration = 30;
@@ -89,7 +85,7 @@ function drawPaddle() {
 function drawBall(ball) {
     ctx.beginPath();
     ctx.arc(ball.x, ball.y, ballRadius, 0, Math.PI * 2);
-    ctx.fillStyle = "#0095DD";
+    ctx.fillStyle = "red"; // Цвет мяча - красный
     ctx.fill();
     ctx.closePath();
 }
@@ -154,26 +150,21 @@ function handleMouseUp(e) {
 }
 
 function touchStartHandler(e) {
-    const touchX = e.touches[0].clientX;
-    if (touchX < canvas.width / 2) {
-        leftPressed = true;
-        rightPressed = false;
-    } else {
-        rightPressed = true;
-        leftPressed = false;
-    }
+    touchStartX = e.touches[0].clientX;
+    leftPressed = rightPressed = false;
 }
 
 function touchMoveHandler(e) {
     touchEndX = e.touches[0].clientX;
     const deltaX = touchEndX - touchStartX;
-    paddleX += deltaX / canvas.width * canvas.clientWidth; // Адаптивное перемещение
+    const movement = deltaX / canvas.clientWidth * canvas.width; // Адаптивное перемещение
+    paddleX += movement;
     if (paddleX < 0) {
         paddleX = 0;
     } else if (paddleX + paddleWidth > canvas.width) {
         paddleX = canvas.width - paddleWidth;
     }
-    touchStartX = touchEndX; // Update start position for next move
+    touchStartX = touchEndX; // Обновление начальной позиции для следующего перемещения
 }
 
 function touchEndHandler(e) {
@@ -221,6 +212,13 @@ function updateTimer() {
     }
 }
 
+function resetBallSpeed(ball) {
+    ball.dx = initialSpeed;
+    ball.dy = -initialSpeed;
+}
+
+let animationId; // Добавляем переменную для хранения ID анимации
+
 function startGame() {
     if (energy < energyConsumption) {
         alert('Not enough energy to play!');
@@ -236,7 +234,7 @@ function startGame() {
     timeLeft = gameDuration;
     timeLeftDisplay.textContent = timeLeft;
     scoreMultiplier = 1;
-    balls = [{ x: canvas.width / 2, y: canvas.height - 30, dx: initialSpeed, dy: -initialSpeed }];
+    balls = [{ x: canvas.width / 2, y: canvas.height - 30, dx: initialSpeed, dy: -initialSpeed }]; // Сброс скорости мяча
     initBricks();
     draw();
     timer = setInterval(updateTimer, 1000);
@@ -244,11 +242,14 @@ function startGame() {
 
 function endGame() {
     clearInterval(timer);
+    cancelAnimationFrame(animationId); // Отменяем анимацию при завершении игры
     totalScore += score;
     totalScoreDisplay.textContent = totalScore;
     mainScreen.style.display = 'block';
     canvas.style.display = 'none';
     timerDisplay.style.display = 'none';
+    balls.forEach(resetBallSpeed); // Сброс скорости мяча при завершении игры
+    balls = []; // Очистить массив мячей
 }
 
 function drawBonus(bonus) {
@@ -317,7 +318,7 @@ function draw() {
     }
 
     if (timeLeft > 0) {
-        requestAnimationFrame(draw);
+        animationId = requestAnimationFrame(draw); // Сохраняем ID анимации
     }
 }
 
