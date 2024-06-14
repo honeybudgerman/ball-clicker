@@ -7,6 +7,7 @@ const totalScoreDisplay = document.getElementById('totalScore');
 const timerDisplay = document.getElementById('timer');
 const timeLeftDisplay = document.getElementById('timeLeft');
 const energyDisplay = document.getElementById('energyDisplay');
+const energyTimerDisplay = document.getElementById('energyTimer'); // Новый элемент
 
 const paddleHeight = 10;
 const paddleWidth = 75;
@@ -33,6 +34,7 @@ let scoreMultiplier = 1;
 let energy = 100;
 const energyConsumption = 10;
 const energyRecoveryTime = 30000;  // 30 секунд
+let energyRecoveryCounter = energyRecoveryTime / 1000; // Счетчик времени до восстановления
 
 // Touch control variables
 let touchStartX = 0;
@@ -65,9 +67,19 @@ function updateEnergy() {
         energyDisplay.textContent = energy;
         saveGameData(); // Save game data when energy is updated
     }
+    energyRecoveryCounter = energyRecoveryTime / 1000; // Сброс счетчика времени восстановления
 }
 
-setInterval(updateEnergy, energyRecoveryTime);
+function updateEnergyTimer() {
+    if (energyRecoveryCounter > 0) {
+        energyRecoveryCounter--;
+        energyTimerDisplay.textContent = `(${energyRecoveryCounter}s)`;
+    } else {
+        updateEnergy();
+    }
+}
+
+setInterval(updateEnergyTimer, 1000);
 
 function initBricks() {
     bricks = [];
