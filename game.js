@@ -1,3 +1,5 @@
+import { auth, db, onAuthStateChanged, doc, setDoc, getDoc } from './firebase-config.js';
+
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const mainScreen = document.getElementById('mainScreen');
@@ -40,32 +42,52 @@ let energyRecoveryCounter = energyRecoveryTime / 1000; // Счетчик вре�
 let touchStartX = 0;
 let touchEndX = 0;
 
-// Load saved game data
-function loadGameData() {
-    const savedEnergy = localStorage.getItem('energy');
-    const savedTotalScore = localStorage.getItem('totalScore');
-    
-    if (savedEnergy !== null) {
-        energy = parseInt(savedEnergy, 10);
+// Save game data to Firestore
+async function saveGameData(uid) {
+    try {
+        await setDoc(doc(db, 'gameData', uid), {
+            energy: energy,
+            totalScore: totalScore
+        });
+        console.log('Game data successfully saved!');
+    } catch (error) {
+        console.error('Error saving game data:', error);
     }
-    if (savedTotalScore !== null) {
-        totalScore = parseInt(savedTotalScore, 10);
-    }
-    energyDisplay.textContent = energy;
-    totalScoreDisplay.textContent = totalScore;
 }
 
-// Save game data
-function saveGameData() {
-    localStorage.setItem('energy', energy);
-    localStorage.setItem('totalScore', totalScore);
+// Load game data from Firestore
+async function loadGameData(uid) {
+    try {
+        const docSnap = await getDoc(doc(db, 'gameData', uid));
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            energy = data.energy;
+            totalScore = data.totalScore;
+            energyDisplay.textContent = energy;
+            totalScoreDisplay.textContent = totalScore;
+        } else {
+            console.log('No game data found!');
+        }
+    } catch (error) {
+        console.error('Error loading game data:', error);
+    }
 }
+
+onAuthStateChanged(auth, user => {
+    if (user) {
+        const uid = user.uid;
+        loadGameData(uid);
+    } else {
+        console.log('User is signed out.');
+    }
+});
 
 function updateEnergy() {
     if (energy < 100) {
         energy += 1;
         energyDisplay.textContent = energy;
-        saveGameData(); // Save game data when energy is updated
+        const uid = auth.currentUser.uid;
+        saveGameData(uid); // Save game data when energy is updated
     }
     energyRecoveryCounter = energyRecoveryTime / 1000; // Сброс счетчика времени восстановления
 }
@@ -261,7 +283,8 @@ function startGame() {
     }
     energy -= energyConsumption;
     energyDisplay.textContent = energy;
-    saveGameData(); // Save game data when game starts
+    const uid = auth.currentUser.uid;
+    saveGameData(uid); // Save game data when game starts
 
     mainScreen.style.display = 'none';
     canvas.style.display = 'block';
@@ -281,7 +304,8 @@ function endGame() {
     cancelAnimationFrame(animationId); // Отменяем анимацию при завершении игры
     totalScore += score;
     totalScoreDisplay.textContent = totalScore;
-    saveGameData(); // Save game data when game ends
+    const uid = auth.currentUser.uid;
+    saveGameData(uid); // Save game data when game ends
     mainScreen.style.display = 'block';
     canvas.style.display = 'none';
     timerDisplay.style.display = 'none';
@@ -367,6 +391,3 @@ function shareScore() {
 
 playButton.addEventListener('click', startGame);
 shareButton.addEventListener('click', shareScore);
-
-// Load game data when the page loads
-window.onload = loadGameData;
