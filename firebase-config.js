@@ -1,8 +1,8 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "firebase/auth";
+import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -11,21 +11,21 @@ const firebaseConfig = {
   projectId: "ballclicker-91a11",
   storageBucket: "ballclicker-91a11.appspot.com",
   messagingSenderId: "811104360453",
-  appId: "1:811104360453:web:3cd207bdddd257e635e46c",
-  measurementId: "G-LMTPDKSZKP"
+  appId: "1:811104360453:web:72742714e37a51ed35e46c",
+  measurementId: "G-NB1XDEQ7M9"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
-// Initialize Firebase Auth
+// Initialize Firebase Auth and Firestore
 const auth = getAuth(app);
+const db = getFirestore(app);
+
+// Sign in anonymously
 signInAnonymously(auth).catch(error => {
   console.error('Error signing in anonymously:', error);
 });
-
-// Initialize Firestore
-const db = getFirestore(app);
 
 export { auth, db, onAuthStateChanged, doc, setDoc, getDoc };
