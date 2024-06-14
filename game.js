@@ -258,6 +258,7 @@ function endGame() {
     cancelAnimationFrame(animationId);
     totalScore += score;
     totalScoreDisplay.textContent = totalScore;
+    saveProgress(); // Сохранение прогресса на сервере
     mainScreen.style.display = 'block';
     canvas.style.display = 'none';
     timerDisplay.style.display = 'none';
@@ -344,6 +345,35 @@ function saveUserData() {
     }));
 }
 
+function loadProgress() {
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", `https://api.telegram.org/bot${botToken}/getUpdates`, true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            const response = JSON.parse(xhr.responseText);
+            if (response.result && response.result.length > 0) {
+                const messages = response.result.map(update => update.message);
+                const lastSaveMessage = messages.reverse().find(message => message.text.startsWith('/save'));
+
+                if (lastSaveMessage) {
+                    const progressData = lastSaveMessage.text.split(' ');
+
+                    if (progressData[0] === '/save' && progressData.length === 3) {
+                        totalScore = parseInt(progressData[1], 10);
+                        energy = parseInt(progressData[2], 10);
+                        totalScoreDisplay.textContent = totalScore;
+                        energyDisplay.textContent = energy;
+                    }
+                }
+            }
+        }
+    };
+
+    xhr.send();
+}
+
 function shareScore() {
     const message = `I scored ${totalScore} points in Breakout Game! Can you beat my score?`;
     const url = `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(message)}`;
@@ -352,3 +382,7 @@ function shareScore() {
 
 playButton.addEventListener('click', startGame);
 shareButton.addEventListener('click', shareScore);
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadProgress(); // Загрузка прогресса при старте
+});
